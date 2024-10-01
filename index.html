@@ -61,21 +61,7 @@
 
         let model, webcam, labelContainer, maxPredictions;
 
-        // メンバーごとのInstagram投稿のURLを定義
-        const instagramPosts = {
-            "Tiffany": "https://www.instagram.com/p/C96m9T9he_D/?igsh=MTByaTNxMjVibWIwNg==",
-            "Ann Drea": "https://www.instagram.com/p/C96mrcJBacB/?igsh=cGpubjAyNm1yYXQy",
-            "Hillary": "https://www.instagram.com/p/C96m0cCB0w6/?igsh=MTA4czduZjF6MW91cQ==",
-            "Khalies": "https://www.instagram.com/p/C96mv7HhQRP/?igsh=MXYwbGhkOWxibXZ0YQ==",
-            "Salwa": "https://www.instagram.com/p/C96mm0eBtbF/?igsh=MXg1eDZkenA5ZGYyNA==",
-            "Amanda": "https://www.instagram.com/p/C96mjGShLXH/?igsh=am82azdjZjA0eWdq",
-            "Lucine": "https://www.instagram.com/p/C96mbhphpGW/?igsh=MWNwYnZyNW1mN3V4Mw==",
-            "Yi Shyan": "https://www.instagram.com/p/C96mCZ_BJAV/?igsh=Y3E3Y2tzNDlybjJ0",
-            "Cocoa": "https://www.instagram.com/p/C96l149h9TE/?igsh=MWVxNWE5cXNlNTQweQ==",
-            "Haruka": "https://www.instagram.com/p/C96llsehw_P/?igsh=MW5zbjV4cXlnaXh1Zg==",
-            "Suzuha": "https://www.instagram.com/p/C96le7Zh8PS/?igsh=MTFibDJxZmppcmtjMg==",
-            "Devi": "https://www.instagram.com/p/C96lHnPBQ-q/?igsh=MXZsdDBnc2NhNW42MA==",
-            "Yurina": "https://www.instagram.com/p/C96k8UDBpi-/?igsh=MXNxMWJ5OTZ6YTJycw=="
+
         };
 
         // カメラ起動
@@ -134,11 +120,6 @@
                 labelContainer.appendChild(div);
             }
 
-            // 第1位のメンバーに対応するInstagram投稿を表示
-            const topPrediction = prediction[0].className;
-            const instagramContainer = document.getElementById("instagram-container");
-            instagramContainer.innerHTML = `<h3>${topPrediction}'s latest post:</h3>`;
-            instagramContainer.innerHTML += `<iframe src="${instagramPosts[topPrediction]}" width="400" height="480" frameborder="0"></iframe>`;
 
             // 撮影後にカメラ停止
             webcam.stop();
