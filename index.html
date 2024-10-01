@@ -51,7 +51,6 @@
     <div id="webcam-container"></div>
     <canvas id="captured-image" style="display: none;"></canvas>
     <div id="label-container"></div>
-    <div id="instagram-container"></div> <!-- Instagram投稿を表示する領域 -->
     <button id="retry-btn" onclick="retry()" style="display: none;">Retry</button>
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
@@ -60,9 +59,6 @@
         const URL = "https://teachablemachine.withgoogle.com/models/EYOuo5_-N/";
 
         let model, webcam, labelContainer, maxPredictions;
-
-
-        };
 
         // カメラ起動
         async function init() {
@@ -120,7 +116,6 @@
                 labelContainer.appendChild(div);
             }
 
-
             // 撮影後にカメラ停止
             webcam.stop();
             webcam.canvas.style.display = "none";
@@ -137,11 +132,9 @@
             document.getElementById("webcam-container").innerHTML = "";
             document.getElementById("label-container").innerHTML = "";
             document.getElementById("captured-image").style.display = "none"; // 撮影された画像を非表示
-            document.getElementById("instagram-container").innerHTML = ""; // Instagram投稿をクリア
             document.getElementById("start-btn").style.display = "inline-block";
             document.getElementById("retry-btn").style.display = "none";
         }
     </script>
 </body>
 </html>
-
