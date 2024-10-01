@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Who do you look alike?</title>
+    <style>
+        body {
+            background-color: #008800;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        button {
+            background-color: white;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #dddddd;
+        }
+        #webcam-container, #image-container, #label-container {
+            margin-top: 20px;
+        }
+        #captured-image {
+            display: none;
+            margin: 20px auto;
+        }
+        /* ボタンのエフェクト */
+        .shake {
+            animation: shake 0.5s ease;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+    </style>
+</head>
+<body>
+    <h1>Who do you look alike?</h1>
+    <button id="start-btn" onclick="init()">Start Camera</button>
+    <button id="capture-btn" onclick="capture()" style="display: none;">Capture</button>
+    <div id="webcam-container"></div>
+    <canvas id="captured-image" style="display: none;"></canvas>
+    <div id="label-container"></div>
+    <button id="retry-btn" onclick="retry()" style="display: none;">Retry</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+    <script type="text/javascript">
+        const URL = "https://teachablemachine.withgoogle.com/models/EYOuo5_-N/";
+
+        let model, webcam, labelContainer, maxPredictions;
+
+        // カメラ起動
+        async function init() {
+            const modelURL = URL + "model.json";
+            const metadataURL = URL + "metadata.json";
+
+            // モデルとメタデータの読み込み
+            model = await tmImage.load(modelURL, metadataURL);
+            maxPredictions = model.getTotalClasses();
+
+            // ウェブカメラの設定
+            const flip = true;
+            webcam = new tmImage.Webcam(200, 200, flip);
+            await webcam.setup();
+            await webcam.play();
+            document.getElementById("webcam-container").appendChild(webcam.canvas);
+
+            // ボタン表示の切り替えとエフェクト
+            document.getElementById("start-btn").style.display = "none";
+            const captureBtn = document.getElementById("capture-btn");
+            captureBtn.style.display = "inline-block";
+            captureBtn.classList.add("shake");  // エフェクトを追加
+            setTimeout(() => captureBtn.classList.remove("shake"), 500);  // エフェクトをすぐに解除
+
+            // 映像をリアルタイムに更新
+            window.requestAnimationFrame(loop);
+        }
+
+        async function loop() {
+            webcam.update();
+            window.requestAnimationFrame(loop);
+        }
+
+        // 撮影と予測
+        async function capture() {
+            // 撮影時のフレームをキャンバスに描画
+            const canvas = document.getElementById("captured-image");
+            const context = canvas.getContext("2d");
+            canvas.width = webcam.canvas.width;
+            canvas.height = webcam.canvas.height;
+            context.drawImage(webcam.canvas, 0, 0);
+
+            // 撮影された画像で予測
+            const prediction = await model.predict(canvas);
+            prediction.sort((a, b) => b.probability - a.probability);
+
+            // 予測結果を表示
+            labelContainer = document.getElementById("label-container");
+            labelContainer.innerHTML = "<h3>You look alike:</h3>";
+            for (let i = 0; i < 3; i++) {
+                const classPrediction = 
+                    prediction[i].className + ": " + (prediction[i].probability * 100).toFixed(2) + "%";
+                const div = document.createElement("div");
+                div.innerHTML = classPrediction;
+                labelContainer.appendChild(div);
+            }
+
+            // 撮影後にカメラ停止
+            webcam.stop();
+            webcam.canvas.style.display = "none";
+            canvas.style.display = "block"; // 撮影された画像を表示
+            canvas.style.margin = "0 auto"; // 中央に配置
+
+            // ボタン表示の切り替え
+            document.getElementById("capture-btn").style.display = "none";
+            document.getElementById("retry-btn").style.display = "inline-block";
+        }
+
+        // リトライ（初期状態に戻す）
+        function retry() {
+            document.getElementById("webcam-container").innerHTML = "";
+            document.getElementById("label-container").innerHTML = "";
+            document.getElementById("captured-image").style.display = "none"; // 撮影された画像を非表示
+            document.getElementById("start-btn").style.display = "inline-block";
+            document.getElementById("retry-btn").style.display = "none";
+        }
+    </script>
+</body>
+</html>
