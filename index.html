@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Who do you look alike?</title>
+    <title>Which KLP48 member do you look like?</title>
     <style>
         body {
             background-color: #008800;
@@ -45,7 +45,7 @@
     </style>
 </head>
 <body>
-    <h1>Who do you look alike?</h1>
+    <h1>Which KLP48 member do you look like?</h1>
     <button id="start-btn" onclick="init()">Start Camera</button>
     <button id="capture-btn" onclick="capture()" style="display: none;">Capture</button>
     <div id="webcam-container"></div>
@@ -107,7 +107,7 @@
 
             // 予測結果を表示
             labelContainer = document.getElementById("label-container");
-            labelContainer.innerHTML = "<h3>You look alike:</h3>";
+            labelContainer.innerHTML = "<h3>You look like:</h3>";
             for (let i = 0; i < 3; i++) {
                 const classPrediction = 
                     prediction[i].className + ": " + (prediction[i].probability * 100).toFixed(2) + "%";
