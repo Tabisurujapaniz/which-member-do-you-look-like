@@ -28,24 +28,15 @@
         button:hover {
             background-color: #dddddd;
         }
-        #webcam-container, #image-container, #label-container {
+        #webcam-container, #image-container, #label-container, #instagram-container {
             margin-top: 20px;
         }
         #captured-image {
             display: none;
             margin: 20px auto;
         }
-        /* Captureボタンの位置調整 */
-        #capture-btn {
-            margin-top: 10px;
-        }
-        /* リトライボタンのスタイル調整 */
         #retry-btn {
-            margin-top: 10px;
-        }
-        /* インスタグラム投稿の埋め込みコンテナを中央揃え */
-        #instagram-container {
-            text-align: center;
+            display: none;
             margin-top: 20px;
         }
         /* ボタンのエフェクト */
@@ -58,42 +49,49 @@
             50% { transform: translateX(5px); }
             75% { transform: translateX(-5px); }
         }
+        /* Instagram埋め込みの中央配置 */
+        #instagram-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        iframe {
+            margin: 0 auto;
+        }
     </style>
 </head>
 <body>
     <h1>Which KLP48 member do you look like?</h1>
     <button id="start-btn" onclick="init()">Start Camera</button>
     <div id="webcam-container"></div>
+    <canvas id="captured-image"></canvas>
     <button id="capture-btn" onclick="capture()" style="display: none;">Capture</button>
-    <canvas id="captured-image" style="display: none;"></canvas>
     <div id="label-container"></div>
-    <button id="retry-btn" onclick="retry()" style="display: none;">Retry</button>
+    <button id="retry-btn" onclick="retry()">Retry</button>
+
     <div id="instagram-container"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
-    <script async src="//www.instagram.com/embed.js"></script>
-
     <script type="text/javascript">
         const URL = "https://teachablemachine.withgoogle.com/models/EYOuo5_-N/";
-        let model, webcam, labelContainer, maxPredictions;
-
-        // Instagramの埋め込みURL
         const instagramPosts = {
-            "Tiffany": "https://www.instagram.com/p/C96m9T9he_D/?igsh=MTByaTNxMjVibWIwNg==",
-            "Ann Drea": "https://www.instagram.com/p/C96mrcJBacB/?igsh=cGpubjAyNm1yYXQy",
-            "Hillary": "https://www.instagram.com/p/C96m0cCB0w6/?igsh=MTA4czduZjF6MW91cQ==",
-            "Khalies": "https://www.instagram.com/p/C96mv7HhQRP/?igsh=MXYwbGhkOWxibXZ0YQ==",
-            "Salwa": "https://www.instagram.com/p/C96mm0eBtbF/?igsh=MXg1eDZkenA5ZGYyNA==",
-            "Amanda": "https://www.instagram.com/p/C96mjGShLXH/?igsh=am82azdjZjA0eWdq",
-            "Lucine": "https://www.instagram.com/p/C96mbhphpGW/?igsh=MWNwYnZyNW1mN3V4Mw==",
-            "Yi Shyan": "https://www.instagram.com/p/C96mCZ_BJAV/?igsh=Y3E3Y2tzNDlybjJ0",
-            "Cocoa": "https://www.instagram.com/p/C96l149h9TE/?igsh=MWVxNWE5cXNlNTQweQ==",
-            "Haruka": "https://www.instagram.com/p/C96llsehw_P/?igsh=MW5zbjV4cXlnaXh1Zg==",
-            "Suzuha": "https://www.instagram.com/p/C96le7Zh8PS/?igsh=MTFibDJxZmppcmtjMg==",
-            "Devi": "https://www.instagram.com/p/C96lHnPBQ-q/?igsh=MXZsdDBnc2NhNW42MA==",
-            "Yurina": "https://www.instagram.com/p/C96k8UDBpi-/?igsh=MXNxMWJ5OTZ6YTJycw=="
+            "Tiffany": "https://www.instagram.com/p/C96m9T9he_D/embed/",
+            "Ann Drea": "https://www.instagram.com/p/C96mrcJBacB/embed/",
+            "Hillary": "https://www.instagram.com/p/C96m0cCB0w6/embed/",
+            "Khalies": "https://www.instagram.com/p/C96mv7HhQRP/embed/",
+            "Salwa": "https://www.instagram.com/p/C96mm0eBtbF/embed/",
+            "Amanda": "https://www.instagram.com/p/C96mjGShLXH/embed/",
+            "Lucine": "https://www.instagram.com/p/C96mbhphpGW/embed/",
+            "Yi Shyan": "https://www.instagram.com/p/C96mCZ_BJAV/embed/",
+            "Cocoa": "https://www.instagram.com/p/C96l149h9TE/embed/",
+            "Haruka": "https://www.instagram.com/p/C96llsehw_P/embed/",
+            "Suzuha": "https://www.instagram.com/p/C96le7Zh8PS/embed/",
+            "Devi": "https://www.instagram.com/p/C96lHnPBQ-q/embed/",
+            "Yurina": "https://www.instagram.com/p/C96k8UDBpi-/embed/"
         };
+
+        let model, webcam, labelContainer, maxPredictions;
 
         // カメラ起動
         async function init() {
@@ -140,26 +138,21 @@
             const prediction = await model.predict(canvas);
             prediction.sort((a, b) => b.probability - a.probability);
 
-            // 予測結果を表示（上位3位まで）
+            // 予測結果を表示
             labelContainer = document.getElementById("label-container");
             labelContainer.innerHTML = "<h3>You look like:</h3>";
             for (let i = 0; i < 3; i++) {
-                const className = prediction[i].className;
-                const probability = (prediction[i].probability * 100).toFixed(2);
-                labelContainer.innerHTML += `<div>${i + 1}. ${className} - ${probability}%</div>`;
+                const classPrediction = 
+                    prediction[i].className + ": " + (prediction[i].probability * 100).toFixed(2) + "%";
+                const div = document.createElement("div");
+                div.innerHTML = classPrediction;
+                labelContainer.appendChild(div);
             }
 
-            // リトライボタンを表示
-            document.getElementById("retry-btn").style.display = "inline-block";
-
-            // 1位のInstagram投稿を表示
+            // Instagram埋め込み
             const topPrediction = prediction[0].className;
             const instagramContainer = document.getElementById("instagram-container");
-            instagramContainer.innerHTML = `<h3>Check out and support ${topPrediction}!</h3>`;
-            instagramContainer.innerHTML += `
-                <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="${instagramPosts[topPrediction]}" data-instgrm-version="14" style="max-width: 540px; min-width: 326px; margin: 0 auto;"></blockquote>
-            `;
-            instgrm.Embeds.process();
+            instagramContainer.innerHTML = `<h3>Check out posts about ${topPrediction}!</h3><iframe src="${instagramPosts[topPrediction]}" width="400" height="480" frameborder="0" scrolling="no" allowtransparency="true"></iframe>`;
 
             // 撮影後にカメラ停止
             webcam.stop();
@@ -169,11 +162,12 @@
 
             // ボタン表示の切り替え
             document.getElementById("capture-btn").style.display = "none";
+            document.getElementById("retry-btn").style.display = "inline-block";
         }
 
-        // リトライ処理 (ブラウザのリフレッシュ)
+        // リトライ（ブラウザをリロード）
         function retry() {
-            location.reload(); // ブラウザをリフレッシュ
+            location.reload(); // ブラウザをリロードしてリトライ
         }
     </script>
 </body>
