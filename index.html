@@ -43,6 +43,11 @@
         #retry-btn {
             margin-top: 10px;
         }
+        /* インスタグラム投稿の埋め込みコンテナを中央揃え */
+        #instagram-container {
+            text-align: center;
+            margin-top: 20px;
+        }
         /* ボタンのエフェクト */
         .shake {
             animation: shake 0.5s ease;
@@ -152,7 +157,7 @@
             const instagramContainer = document.getElementById("instagram-container");
             instagramContainer.innerHTML = `<h3>Check out and support ${topPrediction}!</h3>`;
             instagramContainer.innerHTML += `
-                <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="${instagramPosts[topPrediction]}" data-instgrm-version="14" style="max-width: 540px; min-width: 326px; width:99%; margin: 0 auto;"></blockquote>
+                <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="${instagramPosts[topPrediction]}" data-instgrm-version="14" style="max-width: 540px; min-width: 326px; margin: 0 auto;"></blockquote>
             `;
             instgrm.Embeds.process();
 
@@ -168,7 +173,7 @@
 
         // リトライ処理 (ブラウザのリフレッシュ)
         function retry() {
-            location.reload(); // ブラウザをリフレッシュして再試行
+            location.reload(); // ブラウザをリフレッシュ
         }
     </script>
 </body>
