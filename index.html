@@ -62,8 +62,8 @@
     <button id="capture-btn" onclick="capture()" style="display: none;">Capture</button>
     <canvas id="captured-image" style="display: none;"></canvas>
     <div id="label-container"></div>
-    <div id="instagram-container"></div>
     <button id="retry-btn" onclick="retry()" style="display: none;">Retry</button>
+    <div id="instagram-container"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
@@ -144,6 +144,9 @@
                 labelContainer.innerHTML += `<div>${i + 1}. ${className} - ${probability}%</div>`;
             }
 
+            // リトライボタンを表示
+            document.getElementById("retry-btn").style.display = "inline-block";
+
             // 1位のInstagram投稿を表示
             const topPrediction = prediction[0].className;
             const instagramContainer = document.getElementById("instagram-container");
@@ -161,17 +164,12 @@
 
             // ボタン表示の切り替え
             document.getElementById("capture-btn").style.display = "none";
-            document.getElementById("retry-btn").style.display = "inline-block";
         }
 
-        // リトライ処理
+        // リトライ処理 (ブラウザのリフレッシュ)
         function retry() {
-            document.getElementById("capture-btn").style.display = "inline-block";
-            document.getElementById("webcam-container").style.display = "block";
-            webcam.play();
-            document.getElementById("captured-image").style.display = "none";
-            document.getElementById("label-container").innerHTML = "";
-            document.getElementById("instagram-container").innerHTML = ""; document.getElementById("retry-btn").style.display = "none"; } </script>
-
-</body> 
+            location.reload(); // ブラウザをリフレッシュして再試行
+        }
+    </script>
+</body>
 </html>
