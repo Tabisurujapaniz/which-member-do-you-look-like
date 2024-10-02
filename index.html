@@ -53,6 +53,8 @@
         #instagram-container {
             display: flex;
             justify-content: center;
+            flex-direction: column;
+            align-items: center;
             margin-top: 20px;
         }
         iframe {
@@ -152,7 +154,7 @@
             // Instagram埋め込み
             const topPrediction = prediction[0].className;
             const instagramContainer = document.getElementById("instagram-container");
-            instagramContainer.innerHTML = `<h3>Check out posts about ${topPrediction}!</h3><iframe src="${instagramPosts[topPrediction]}" width="400" height="480" frameborder="0" scrolling="no" allowtransparency="true"></iframe>`;
+            instagramContainer.innerHTML = `<h3>Check out and support ${topPrediction}!</h3><iframe src="${instagramPosts[topPrediction]}" width="400" height="480" frameborder="0" scrolling="no" allowtransparency="true"></iframe>`;
 
             // 撮影後にカメラ停止
             webcam.stop();
